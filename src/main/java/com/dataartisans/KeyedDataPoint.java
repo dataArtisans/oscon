@@ -1,0 +1,30 @@
+package com.dataartisans;
+
+public class KeyedDataPoint<T> extends DataPoint<T> {
+
+  private String key;
+
+  public KeyedDataPoint(){
+    super();
+    this.key = null;
+  }
+
+  public KeyedDataPoint(String key, long timeStampMs, T value) {
+    super(timeStampMs, value);
+    this.key = key;
+  }
+
+  @Override
+  public String toString() {
+    return getTimeStampMs() + "," + getKey() + "," + getValue();
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+}
