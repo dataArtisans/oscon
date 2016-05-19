@@ -27,4 +27,8 @@ public class KeyedDataPoint<T> extends DataPoint<T> {
     this.key = key;
   }
 
+  public <R> KeyedDataPoint<R> withNewValue(R newValue){
+    return new KeyedDataPoint<>(this.getKey(), this.getTimeStampMs(), newValue);
+  }
+
 }

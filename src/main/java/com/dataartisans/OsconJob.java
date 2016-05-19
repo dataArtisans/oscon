@@ -1,9 +1,10 @@
 package com.dataartisans;
 
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
-import org.apache.flink.streaming.api.TimeCharacteristic;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -16,33 +17,26 @@ public class OsconJob {
     final StreamExecutionEnvironment env =
       StreamExecutionEnvironment.getExecutionEnvironment();
 
-    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(1000, 1000));
-    env.setParallelism(1);
-    env.disableOperatorChaining();
-
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-    env.enableCheckpointing(1000);
-
     // Simulate some sensor data
-    DataStream<KeyedDataPoint<Double>> sensorStream = generateSensorData(env);
 
     // Write this sensor stream out to InfluxDB
-    sensorStream
-      .addSink(new InfluxDBSink<>("sensors"));
 
     // Compute a windowed sum over this data and write that to InfluxDB as well.
-    sensorStream
-      .keyBy("key")
-      .timeWindow(Time.seconds(1))
-      .sum("value")
-      .addSink(new InfluxDBSink<>("summedSensors"));
 
+    // add a socket source
+
+    // modulate sensor stream via control stream
 
     // execute program
     env.execute("OSCON Example");
   }
 
   private static DataStream<KeyedDataPoint<Double>> generateSensorData(StreamExecutionEnvironment env) {
+
+    // boiler plate for this demo
+    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(1000, 1000));
+    env.setParallelism(1);
+    env.disableOperatorChaining();
 
     final int SLOWDOWN_FACTOR = 1;
     final int PERIOD_MS = 100;
@@ -53,7 +47,7 @@ public class OsconJob {
 
     // Transform into sawtooth pattern
     SingleOutputStreamOperator<DataPoint<Double>> sawtoothStream = timestampSource
-      .map(new SawtoothFunction(100))
+      .map(new SawtoothFunction(10))
       .name("sawTooth");
 
     // Simulate temp sensor
@@ -83,4 +77,5 @@ public class OsconJob {
 
     return sensorStream;
   }
+
 }
