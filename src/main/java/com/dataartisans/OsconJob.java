@@ -20,6 +20,9 @@ public class OsconJob {
     env.setParallelism(1);
     env.disableOperatorChaining();
 
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    env.enableCheckpointing(1000);
+
     // Simulate some sensor data
     DataStream<KeyedDataPoint<Double>> sensorStream = generateSensorData(env);
 
@@ -30,22 +33,27 @@ public class OsconJob {
     // Compute a windowed sum over this data and write that to InfluxDB as well.
     sensorStream
       .keyBy("key")
-      .timeWindow(Time.seconds(100))
+      .timeWindow(Time.seconds(1))
       .sum("value")
       .addSink(new InfluxDBSink<>("summedSensors"));
+
 
     // execute program
     env.execute("OSCON Example");
   }
 
   private static DataStream<KeyedDataPoint<Double>> generateSensorData(StreamExecutionEnvironment env) {
+
+    final int SLOWDOWN_FACTOR = 1;
+    final int PERIOD_MS = 100;
+
     // Initial data - just timestamped messages
     DataStreamSource<DataPoint<Long>> timestampSource =
-      env.addSource(new TimestampSource(100, 1), "test data");
+      env.addSource(new TimestampSource(PERIOD_MS, SLOWDOWN_FACTOR), "test data");
 
     // Transform into sawtooth pattern
     SingleOutputStreamOperator<DataPoint<Double>> sawtoothStream = timestampSource
-      .map(new SawtoothFunction(1000))
+      .map(new SawtoothFunction(100))
       .name("sawTooth");
 
     // Simulate temp sensor
