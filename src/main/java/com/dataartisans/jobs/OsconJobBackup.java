@@ -1,5 +1,11 @@
-package com.dataartisans;
+package com.dataartisans.jobs;
 
+import com.dataartisans.sources.TimestampSource;
+import com.dataartisans.data.ControlMessage;
+import com.dataartisans.data.DataPoint;
+import com.dataartisans.data.KeyedDataPoint;
+import com.dataartisans.functions.*;
+import com.dataartisans.sinks.InfluxDBSink;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.datastream.DataStream;

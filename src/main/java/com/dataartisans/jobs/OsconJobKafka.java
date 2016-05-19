@@ -1,5 +1,9 @@
-package com.dataartisans;
+package com.dataartisans.jobs;
 
+import com.dataartisans.functions.SensorDataWatermarkAssigner;
+import com.dataartisans.data.DataPointSerializationSchema;
+import com.dataartisans.data.KeyedDataPoint;
+import com.dataartisans.sinks.InfluxDBSink;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;

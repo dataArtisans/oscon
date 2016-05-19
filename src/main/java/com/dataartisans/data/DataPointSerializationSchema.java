@@ -1,5 +1,6 @@
-package com.dataartisans;
+package com.dataartisans.data;
 
+import com.dataartisans.data.KeyedDataPoint;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.util.serialization.DeserializationSchema;
@@ -7,7 +8,7 @@ import org.apache.flink.streaming.util.serialization.SerializationSchema;
 
 import java.io.IOException;
 
-class DataPointSerializationSchema implements SerializationSchema<KeyedDataPoint<Double>>, DeserializationSchema<KeyedDataPoint<Double>> {
+public class DataPointSerializationSchema implements SerializationSchema<KeyedDataPoint<Double>>, DeserializationSchema<KeyedDataPoint<Double>> {
   @Override
   public byte[] serialize(KeyedDataPoint<Double> dataPoint) {
     String s =  dataPoint.getTimeStampMs() + "," + dataPoint.getKey() + "," + dataPoint.getValue();

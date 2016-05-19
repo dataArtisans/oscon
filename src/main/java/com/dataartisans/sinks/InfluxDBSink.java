@@ -1,5 +1,7 @@
-package com.dataartisans;
+package com.dataartisans.sinks;
 
+import com.dataartisans.data.DataPoint;
+import com.dataartisans.data.KeyedDataPoint;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.influxdb.InfluxDB;

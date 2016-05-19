@@ -1,11 +1,13 @@
-package com.dataartisans;
+package com.dataartisans.functions;
 
+import com.dataartisans.data.ControlMessage;
+import com.dataartisans.data.KeyedDataPoint;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.co.RichCoFlatMapFunction;
 import org.apache.flink.util.Collector;
 
-class AmplifierFunction extends RichCoFlatMapFunction<KeyedDataPoint<Double>, ControlMessage, KeyedDataPoint<Double>> {
+public class AmplifierFunction extends RichCoFlatMapFunction<KeyedDataPoint<Double>, ControlMessage, KeyedDataPoint<Double>> {
 
   ValueStateDescriptor<Double> stateDesc = new ValueStateDescriptor<>("amplitude", Double.class, 0.0);
 

@@ -1,15 +1,20 @@
-package com.dataartisans;
+package com.dataartisans.jobs;
 
-import org.apache.flink.api.common.restartstrategy.RestartStrategies;
-import org.apache.flink.api.java.tuple.Tuple;
+import com.dataartisans.sources.TimestampSource;
+import com.dataartisans.data.DataPoint;
+import com.dataartisans.data.DataPointSerializationSchema;
+import com.dataartisans.data.KeyedDataPoint;
+import com.dataartisans.functions.AssignKeyFunction;
+import com.dataartisans.functions.SawtoothFunction;
+import com.dataartisans.functions.SineWaveFunction;
+import com.dataartisans.functions.SquareWaveFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer09;
 
-public class OsconJob {
+public class SensorSimulatorJob {
 
   public static void main(String[] args) throws Exception {
 
@@ -17,33 +22,12 @@ public class OsconJob {
     final StreamExecutionEnvironment env =
       StreamExecutionEnvironment.getExecutionEnvironment();
 
-    // Simulate some sensor data
-
-    // Write this sensor stream out to InfluxDB
-
-    // Compute a windowed sum over this data and write that to InfluxDB as well.
-
-    // add a socket source
-
-    // modulate sensor stream via control stream
-
-    // execute program
-    env.execute("OSCON Example");
-  }
-
-  private static DataStream<KeyedDataPoint<Double>> generateSensorData(StreamExecutionEnvironment env) {
-
-    // boiler plate for this demo
-    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(1000, 1000));
+    env.enableCheckpointing(1000);
     env.setParallelism(1);
-    env.disableOperatorChaining();
-
-    final int SLOWDOWN_FACTOR = 1;
-    final int PERIOD_MS = 100;
 
     // Initial data - just timestamped messages
     DataStreamSource<DataPoint<Long>> timestampSource =
-      env.addSource(new TimestampSource(PERIOD_MS, SLOWDOWN_FACTOR), "test data");
+      env.addSource(new TimestampSource(100, 1), "test data");
 
     // Transform into sawtooth pattern
     SingleOutputStreamOperator<DataPoint<Double>> sawtoothStream = timestampSource
@@ -70,12 +54,16 @@ public class OsconJob {
       .name("assignKey(door)");
 
     // Combine all the streams into one and write it to Kafka
-    DataStream<KeyedDataPoint<Double>> sensorStream =
+    DataStream<KeyedDataPoint<Double>> sensorsStream =
       tempStream
         .union(pressureStream)
         .union(doorStream);
 
-    return sensorStream;
+    // Write it to Kafka
+    sensorsStream.addSink(new FlinkKafkaProducer09<>("localhost:9092", "sensors", new DataPointSerializationSchema()));
+
+    // execute program
+    env.execute("OSCON Data Generator");
   }
 
 }

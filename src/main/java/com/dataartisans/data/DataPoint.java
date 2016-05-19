@@ -1,4 +1,4 @@
-package com.dataartisans;
+package com.dataartisans.data;
 
 public class DataPoint<T> {
 

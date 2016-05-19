@@ -1,5 +1,7 @@
-package com.dataartisans;
+package com.dataartisans.functions;
 
+import com.dataartisans.data.DataPoint;
+import com.dataartisans.data.KeyedDataPoint;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
 

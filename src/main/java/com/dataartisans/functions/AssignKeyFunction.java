@@ -1,5 +1,7 @@
-package com.dataartisans;
+package com.dataartisans.functions;
 
+import com.dataartisans.data.DataPoint;
+import com.dataartisans.data.KeyedDataPoint;
 import org.apache.flink.api.common.functions.MapFunction;
 
 public class AssignKeyFunction implements MapFunction<DataPoint<Double>, KeyedDataPoint<Double>> {

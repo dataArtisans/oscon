@@ -1,7 +1,7 @@
-package com.dataartisans;
+package com.dataartisans.functions;
 
+import com.dataartisans.data.DataPoint;
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.apache.flink.streaming.api.checkpoint.CheckpointedAsynchronously;
 
 /*
  * Expects a sawtooth wave as input!

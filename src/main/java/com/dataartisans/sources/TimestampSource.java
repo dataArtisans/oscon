@@ -1,5 +1,6 @@
-package com.dataartisans;
+package com.dataartisans.sources;
 
+import com.dataartisans.data.DataPoint;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.checkpoint.Checkpointed;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
