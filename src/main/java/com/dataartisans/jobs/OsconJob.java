@@ -8,6 +8,7 @@ import com.dataartisans.data.DataPoint;
 import com.dataartisans.data.KeyedDataPoint;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -22,6 +23,12 @@ public class OsconJob {
     // set up the execution environment
     final StreamExecutionEnvironment env =
       StreamExecutionEnvironment.getExecutionEnvironment();
+
+    // Uncomment this line to enable fault-tolerance for state
+    //env.enableCheckpointing(1000);
+
+    // Uncomment this line to enable Event Time
+    //env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
     // Simulate some sensor data
     DataStream<KeyedDataPoint<Double>> sensorStream = generateSensorData(env);
