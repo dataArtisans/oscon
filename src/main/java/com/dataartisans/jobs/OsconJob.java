@@ -45,16 +45,16 @@ public class OsconJob {
       .addSink(new InfluxDBSink<>("summedSensors"));
 
     // add a socket source
-    KeyedStream<ControlMessage, Tuple> controlStream = env.socketTextStream("localhost", 9999)
-      .map(msg -> ControlMessage.fromString(msg))
-      .keyBy("key");
+//    KeyedStream<ControlMessage, Tuple> controlStream = env.socketTextStream("localhost", 9999)
+//      .map(msg -> ControlMessage.fromString(msg))
+//      .keyBy("key");
 
     // modulate sensor stream via control stream
-    sensorStream
-      .keyBy("key")
-      .connect(controlStream)
-      .flatMap(new AmplifierFunction())
-      .addSink(new InfluxDBSink<>("amplifiedSensors"));
+//    sensorStream
+//      .keyBy("key")
+//      .connect(controlStream)
+//      .flatMap(new AmplifierFunction())
+//      .addSink(new InfluxDBSink<>("amplifiedSensors"));
 
     // execute program
     env.execute("OSCON Example");
