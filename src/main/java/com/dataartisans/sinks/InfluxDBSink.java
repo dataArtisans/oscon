@@ -46,6 +46,6 @@ public class InfluxDBSink<T extends DataPoint<? extends Number>> extends RichSin
 
     Point p = builder.build();
 
-    influxDB.write(dataBaseName, "default", p);
+    influxDB.write(dataBaseName, "autogen", p);
   }
 }
