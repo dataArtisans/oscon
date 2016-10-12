@@ -31,4 +31,7 @@ public class KeyedDataPoint<T> extends DataPoint<T> {
     return new KeyedDataPoint<>(this.getKey(), this.getTimeStampMs(), newValue);
   }
 
+  public static KeyedDataPoint<Double> sum(KeyedDataPoint<Double> p1, KeyedDataPoint<Double> p2) {
+    return p1.withNewValue(p1.getValue() + p2.getValue());
+  }
 }

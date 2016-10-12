@@ -41,7 +41,7 @@ public class OsconJobKafka {
     FlinkKafkaConsumer09<KeyedDataPoint<Double>> kafkaConsumer =
       new FlinkKafkaConsumer09<>("sensors", new DataPointSerializationSchema(), kafkaProperties);
 
-    // Add it as a source
+    // Add it as a stream
     SingleOutputStreamOperator<KeyedDataPoint<Double>> sensorStream = env.addSource(kafkaConsumer);
 
     if(useEventTime){
