@@ -24,11 +24,9 @@ public class OsconJob {
     final StreamExecutionEnvironment env =
       StreamExecutionEnvironment.getExecutionEnvironment();
 
-    // Uncomment this line to enable fault-tolerance for state
-    //env.enableCheckpointing(1000);
+//    env.enableCheckpointing(1000);
 
-    // Uncomment this line to enable Event Time
-    //env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+//    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
     // Simulate some sensor data
     DataStream<KeyedDataPoint<Double>> sensorStream = generateSensorData(env);
@@ -57,15 +55,17 @@ public class OsconJob {
 //      .addSink(new InfluxDBSink<>("amplifiedSensors"));
 
     // execute program
-    env.execute("OSCON Example");
+    env.execute("Flink Demo");
   }
 
   private static DataStream<KeyedDataPoint<Double>> generateSensorData(StreamExecutionEnvironment env) {
 
     // boiler plate for this demo
     env.setRestartStrategy(RestartStrategies.fixedDelayRestart(1000, 1000));
+    env.setMaxParallelism(8);
     env.setParallelism(1);
     env.disableOperatorChaining();
+    env.getConfig().setLatencyTrackingInterval(1000);
 
     final int SLOWDOWN_FACTOR = 1;
     final int PERIOD_MS = 100;
