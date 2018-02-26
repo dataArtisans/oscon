@@ -8,25 +8,31 @@ import com.dataartisans.data.DataPoint;
 import com.dataartisans.data.KeyedDataPoint;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.configuration.ConfigConstants;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
 public class OsconJob {
 
   public static void main(String[] args) throws Exception {
+//    Configuration conf = new Configuration();
+//    conf.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
+//    final StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
 
     // set up the execution environment
     final StreamExecutionEnvironment env =
       StreamExecutionEnvironment.getExecutionEnvironment();
 
-//    env.enableCheckpointing(1000);
+    env.enableCheckpointing(1000);
 
-//    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
     // Simulate some sensor data
     DataStream<KeyedDataPoint<Double>> sensorStream = generateSensorData(env);
@@ -42,12 +48,12 @@ public class OsconJob {
       .sum("value")
       .addSink(new InfluxDBSink<>("summedSensors"));
 
-    // add a socket source
+//    // add a socket source
 //    KeyedStream<ControlMessage, Tuple> controlStream = env.socketTextStream("localhost", 9999)
 //      .map(msg -> ControlMessage.fromString(msg))
 //      .keyBy("key");
-
-    // modulate sensor stream via control stream
+//
+//    // modulate sensor stream via control stream
 //    sensorStream
 //      .keyBy("key")
 //      .connect(controlStream)

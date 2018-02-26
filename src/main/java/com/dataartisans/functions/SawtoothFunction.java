@@ -4,9 +4,12 @@ import com.dataartisans.data.DataPoint;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.metrics.Counter;
-import org.apache.flink.streaming.api.checkpoint.CheckpointedAsynchronously;
+import org.apache.flink.streaming.api.checkpoint.ListCheckpointed;
 
-public class SawtoothFunction extends RichMapFunction<DataPoint<Long>, DataPoint<Double>> implements CheckpointedAsynchronously<Integer> {
+import java.util.Collections;
+import java.util.List;
+
+public class SawtoothFunction extends RichMapFunction<DataPoint<Long>, DataPoint<Double>> implements ListCheckpointed<Integer> {
 
   final private int numSteps;
   private Counter datapoints;
@@ -35,12 +38,15 @@ public class SawtoothFunction extends RichMapFunction<DataPoint<Long>, DataPoint
   }
 
   @Override
-  public Integer snapshotState(long checkpointId, long checkpointTimestamp) throws Exception {
-    return currentStep;
+  public void restoreState(List<Integer> state) throws Exception {
+    for (Integer s : state) {
+      this.currentStep = s;
+    }
   }
 
   @Override
-  public void restoreState(Integer state) throws Exception {
-    currentStep = state;
+  public List<Integer> snapshotState(long checkpointId, long checkpointTimestamp) throws Exception {
+    return Collections.singletonList(currentStep);
   }
+
 }
