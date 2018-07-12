@@ -8,8 +8,7 @@ import org.apache.flink.streaming.api.functions.co.RichCoFlatMapFunction;
 import org.apache.flink.util.Collector;
 
 public class AmplifierFunction extends RichCoFlatMapFunction<KeyedDataPoint<Double>, ControlMessage, KeyedDataPoint<Double>> {
-
-  ValueStateDescriptor<Double> stateDesc = new ValueStateDescriptor<>("amplitude", Double.class, 0.0);
+  ValueStateDescriptor<Double> stateDesc = new ValueStateDescriptor<>("amplitude", Double.class);
 
   @Override
   public void open(Configuration parameters) throws Exception {
@@ -19,6 +18,10 @@ public class AmplifierFunction extends RichCoFlatMapFunction<KeyedDataPoint<Doub
   @Override
   public void flatMap1(KeyedDataPoint<Double> dataPoint, Collector<KeyedDataPoint<Double>> collector) throws Exception {
     Double amplitude = getRuntimeContext().getState(stateDesc).value();
+    if (amplitude == null) {
+      amplitude = 0.0;
+      getRuntimeContext().getState(stateDesc).update(amplitude);
+    }
     collector.collect(dataPoint.withNewValue(dataPoint.getValue() * amplitude));
   }
 

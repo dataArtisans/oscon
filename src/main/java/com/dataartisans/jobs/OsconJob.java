@@ -10,6 +10,7 @@ import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -31,7 +32,6 @@ public class OsconJob {
       StreamExecutionEnvironment.getExecutionEnvironment();
 
     env.enableCheckpointing(1000);
-
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
     // Simulate some sensor data
@@ -48,17 +48,17 @@ public class OsconJob {
       .sum("value")
       .addSink(new InfluxDBSink<>("summedSensors"));
 
-//    // add a socket source
-//    KeyedStream<ControlMessage, Tuple> controlStream = env.socketTextStream("localhost", 9999)
-//      .map(msg -> ControlMessage.fromString(msg))
-//      .keyBy("key");
-//
-//    // modulate sensor stream via control stream
-//    sensorStream
-//      .keyBy("key")
-//      .connect(controlStream)
-//      .flatMap(new AmplifierFunction())
-//      .addSink(new InfluxDBSink<>("amplifiedSensors"));
+    // add a socket source
+    KeyedStream<ControlMessage, Tuple> controlStream = env.socketTextStream("localhost", 9999)
+      .map(msg -> ControlMessage.fromString(msg))
+      .keyBy("key");
+
+    // modulate sensor stream via control stream
+    sensorStream
+      .keyBy("key")
+      .connect(controlStream)
+      .flatMap(new AmplifierFunction())
+      .addSink(new InfluxDBSink<>("amplifiedSensors"));
 
     // execute program
     env.execute("Flink Demo");
