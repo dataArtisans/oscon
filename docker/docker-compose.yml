@@ -1,0 +1,25 @@
+influxdb:
+  image: 'influxdb:1.5.4'
+  container_name: influxdb
+  ports:
+    - "8086:8086"
+    - "8088:8088"
+  environment:
+    - INFLUXDB_DATA_ENGINE=tsm1
+    - INFLUXDB_REPORTING_DISABLED=false
+
+grafana:
+  image: 'grafana/grafana:5.2.1'
+  container_name: grafana
+  ports:
+    - "3000:3000"
+  environment:
+    - GF_INSTALL_PLUGINS=grafana-clock-panel,briangann-gauge-panel,natel-plotly-panel,grafana-simple-json-datasource
+  links:
+    - influxdb
+
+grafana_setup:
+   build: './grafana_setup'
+   container_name: grafana_setup
+   links:
+     - grafana

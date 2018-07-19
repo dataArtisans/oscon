@@ -2,11 +2,16 @@ package com.dataartisans.sources;
 
 import com.dataartisans.data.DataPoint;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.checkpoint.Checkpointed;
+import org.apache.flink.metrics.Counter;
+import org.apache.flink.metrics.Meter;
+import org.apache.flink.streaming.api.checkpoint.ListCheckpointed;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
 
-public class TimestampSource extends RichSourceFunction<DataPoint<Long>> implements Checkpointed<Long> {
+import java.util.Collections;
+import java.util.List;
+
+public class TimestampSource extends RichSourceFunction<DataPoint<Long>> implements ListCheckpointed<Long> {
   private final int periodMs;
   private final int slowdownFactor;
   private volatile boolean running = true;
@@ -46,13 +51,14 @@ public class TimestampSource extends RichSourceFunction<DataPoint<Long>> impleme
   }
 
   @Override
-  public Long snapshotState(long checkpointId, long checkpointTimestamp) throws Exception {
-    return currentTimeMs;
+  public List<Long> snapshotState(long checkpointId, long checkpointTimestamp) throws Exception {
+    return Collections.singletonList(currentTimeMs);
   }
 
   @Override
-  public void restoreState(Long state) throws Exception {
-    currentTimeMs = state;
+  public void restoreState(List<Long> state) throws Exception {
+    for (Long s : state)
+      currentTimeMs = s;
   }
 
   private void timeSync() throws InterruptedException {
