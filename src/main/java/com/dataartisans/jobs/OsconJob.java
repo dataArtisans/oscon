@@ -31,34 +31,37 @@ public class OsconJob {
     final StreamExecutionEnvironment env =
       StreamExecutionEnvironment.getExecutionEnvironment();
 
-    env.enableCheckpointing(1000);
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+//    env.enableCheckpointing(1000);
+//    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
     // Simulate some sensor data
     DataStream<KeyedDataPoint<Double>> sensorStream = generateSensorData(env);
 
     // Write this sensor stream out to InfluxDB
     sensorStream
-      .addSink(new InfluxDBSink<>("sensors"));
+      .addSink(new InfluxDBSink<>("sensors"))
+      .name("sensors-sink");
 
     // Compute a windowed sum over this data and write that to InfluxDB as well.
     sensorStream
       .keyBy("key")
       .timeWindow(Time.seconds(1))
       .sum("value")
-      .addSink(new InfluxDBSink<>("summedSensors"));
+      .name("window")
+      .addSink(new InfluxDBSink<>("summedSensors"))
+      .name("summed-sensors-sink");
 
     // add a socket source
-    KeyedStream<ControlMessage, Tuple> controlStream = env.socketTextStream("localhost", 9999)
-      .map(msg -> ControlMessage.fromString(msg))
-      .keyBy("key");
-
-    // modulate sensor stream via control stream
-    sensorStream
-      .keyBy("key")
-      .connect(controlStream)
-      .flatMap(new AmplifierFunction())
-      .addSink(new InfluxDBSink<>("amplifiedSensors"));
+//    KeyedStream<ControlMessage, Tuple> controlStream = env.socketTextStream("localhost", 9999)
+//      .map(msg -> ControlMessage.fromString(msg))
+//      .keyBy("key");
+//
+//    // modulate sensor stream via control stream
+//    sensorStream
+//      .keyBy("key")
+//      .connect(controlStream)
+//      .flatMap(new AmplifierFunction())
+//      .addSink(new InfluxDBSink<>("amplifiedSensors"));
 
     // execute program
     env.execute("Flink Demo");
