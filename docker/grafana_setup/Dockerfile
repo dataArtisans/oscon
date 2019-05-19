@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 
 ADD dashboard.json /tmp
 ADD influxdb_datasource.json /tmp
